@@ -12,7 +12,7 @@ env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
   GH_TOKEN: ${{ github.token }}
-  PROD_REPO: https://github.com/nesi/support-docs
+  PROD_REPO: nesi/support-docs
 permissions:
   contents: write
   pull-requests:  write
