@@ -72,10 +72,10 @@ jobs:
         with:
           key: mkdocs-${{ hashfiles('.cache/**') }}
           path: .cache
-      - name: Post messages to PRs
-        run: |
-          for pr in ${{ steps.dev-deps.outputs.branches }}; do
-            msg="Test deployment available at <a href=\"https://docs.nesi.org.nz/${pr}\">https://docs.nesi.org.nz/${pr}</a>"
-            (gh pr comment ${pr} --repo $PROD_REPO --edit-last --body "${msg}") || (gh pr comment ${pr} --repo $PROD_REPO --body "${msg}")
-          done
+      # - name: Post messages to PRs
+      #   run: |
+      #     for pr in ${{ steps.dev-deps.outputs.branches }}; do
+      #       msg="Test deployment available at <a href=\"https://docs.nesi.org.nz/${pr}\">https://docs.nesi.org.nz/${pr}</a>"
+      #       (gh pr comment ${pr} --repo $PROD_REPO --edit-last --body "${msg}") || (gh pr comment ${pr} --repo $PROD_REPO --body "${msg}")
+      #     done
 
