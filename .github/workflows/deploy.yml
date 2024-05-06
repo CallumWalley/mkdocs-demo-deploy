@@ -4,10 +4,9 @@ on:
     branches: [main]
  workflow_dispatch:
   inputs:
-    pr-deploy:
-      description: Deploy open merge requests in sub-directories.
-      type: boolean
-      default: true
+    pr-branches:
+      description: List of branches to deploy.
+      type: text
 env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
@@ -28,9 +27,6 @@ jobs:
         with:
           repository: ${{ env.PROD_REPO }}
           fetch-depth: 0
-          sparse-checkout: |
-            docs
-            overrides
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
@@ -46,13 +42,11 @@ jobs:
             mkdocs-
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Get list of dev deployments
-        id: dev-deps
-        run: |
-          echo "branches=$(for pr in $(gh pr list --repo $PROD_REPO --json headRefName | jq -r '.[].headRefName'); do gh pr checks $pr --repo $PROD_REPO > /dev/null && printf "${pr} "; done)" >> $GITHUB_OUTPUT
       - name: Create dev sub-deployments
         run: |
-            for pr in ${{ steps.dev-deps.outputs.branches }}; do git --work-tree=docs/ checkout origin/$pr -- docs/ && mv docs/docs docs/$pr; done
+            for pr in ${{ inputs.pr-branches }}; do 
+                git --work-tree=docs/ checkout origin/$pr -- docs/ && mv docs/docs docs/$pr
+            done
       - name: Build documentation
         run: |
               mkdocs build --clean --quiet
@@ -72,10 +66,3 @@ jobs:
         with:
           key: mkdocs-${{ hashfiles('.cache/**') }}
           path: .cache
-      # - name: Post messages to PRs
-      #   run: |
-      #     for pr in ${{ steps.dev-deps.outputs.branches }}; do
-      #       msg="Test deployment available at <a href=\"https://docs.nesi.org.nz/${pr}\">https://docs.nesi.org.nz/${pr}</a>"
-      #       (gh pr comment ${pr} --repo $PROD_REPO --edit-last --body "${msg}") || (gh pr comment ${pr} --repo $PROD_REPO --body "${msg}")
-      #     done
-
