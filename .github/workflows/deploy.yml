@@ -1,10 +1,12 @@
 name: Deploy to gh-pages 
-on: 
- workflow_dispatch:
-  inputs:
-    pr-branches:
-      description: List of branches to deploy.
-      type: text
+on:
+  repository_dispatch:
+    types: trigger-workflow
+  workflow_dispatch:
+    inputs:
+      pr-branches:
+        description: List of branches to deploy.
+        type: text
 env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
