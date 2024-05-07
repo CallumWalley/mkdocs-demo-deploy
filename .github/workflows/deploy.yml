@@ -22,11 +22,11 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: ${{ env.PROD_REPO }}
-      #     fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PROD_REPO }}
+          fetch-depth: 0
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
