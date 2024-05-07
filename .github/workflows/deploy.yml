@@ -22,11 +22,11 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.PROD_REPO }}
-          fetch-depth: 0
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: ${{ env.PROD_REPO }}
+      #     fetch-depth: 0
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
@@ -44,17 +44,15 @@ jobs:
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
         run: |
+            mkdir public
             for pr in ${{ github.event.client_payload.pr-branches }}; do
                 # for file in $(git diff --name-only origin/$pr);do
                 #   git --work-tree=docs/ checkout origin/$pr -- $file || true
                 # done
-                mkdir $pr
-                git --work-tree=$pr checkout origin/$pr
-                cd $pr && mkdocs build && cd .. || cd ..
+                
+                git checkout origin/$pr
+                mkdocs build --quiet --site-dir public/$pr
             done
-      - name: Build documentation
-        run: |
-              mkdocs build --clean --quiet
       - name: Adjust permissions
         run: |
           chmod -c -R +rX public/ | while read line; do
