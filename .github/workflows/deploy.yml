@@ -45,10 +45,12 @@ jobs:
       - name: Create dev sub-deployments
         run: |
             for pr in ${{ github.event.client_payload.pr-branches }}; do
-                for file in $(git diff --name-only origin/$pr);do
-                  git --work-tree=docs/ checkout origin/$pr -- $file || true
-                done
-                mv docs/docs docs/$pr
+                # for file in $(git diff --name-only origin/$pr);do
+                #   git --work-tree=docs/ checkout origin/$pr -- $file || true
+                # done
+                mkdir $pr
+                git --work-tree=$pr checkout origin/$pr
+                cd $pr && mkdocs build && cd .. || cd ..
             done
       - name: Build documentation
         run: |
