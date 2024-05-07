@@ -44,7 +44,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
         run: |
-            for pr in ${{ inputs.pr-branches }}; do 
+            for pr in ${{ github.event.client_payload.pr-branches }}; do 
                 git --work-tree=docs/ checkout origin/$pr -- docs/ && mv docs/docs docs/$pr
             done
       - name: Build documentation
