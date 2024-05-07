@@ -46,7 +46,7 @@ jobs:
         run: |
             for pr in ${{ github.event.client_payload.pr-branches }}; do
                 for file in $(git diff --name-only origin/$pr);do
-                  git --work-tree=docs/ checkout origin/$pr -- $file
+                  git --work-tree=docs/ checkout origin/$pr -- $file || true
                 done
                 mv docs/docs docs/$pr
             done
