@@ -1,1 +1,1 @@
-[support documentation](docs.nesi.org.nz)
+[support documentation](https://docs.nesi.org.nz)
