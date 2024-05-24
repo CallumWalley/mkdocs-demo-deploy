@@ -45,13 +45,9 @@ jobs:
       - name: Create dev sub-deployments
         run: |
             mkdir public
-            for pr in ${{ github.event.client_payload.pr-branches }}; do
-                # for file in $(git diff --name-only origin/$pr);do
-                #   git --work-tree=docs/ checkout origin/$pr -- $file || true
-                # done
-                
-                git checkout origin/$pr
-                mkdocs build --quiet --site-dir public/$pr
+            for pr in ${{ github.event.client_payload.pr-branches }}; do                
+                git checkout origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
+                mkdocs build --quiet --site-dir public/$pr 
             done
       - name: Adjust permissions
         run: |
