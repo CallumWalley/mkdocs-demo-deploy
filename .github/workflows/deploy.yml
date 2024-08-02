@@ -65,7 +65,6 @@ jobs:
         run: |
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
               msg="Test deployment available at <a href=\"${DEPLOY_URL}/${pr}\">${DEPLOY_URL}/${pr}</a>"
-              gh auth status -R ${PROD_REPO}
               gh pr view ${pr} -R ${PROD_REPO}
               gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO}
               
