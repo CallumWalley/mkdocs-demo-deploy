@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
-      #   path: .cache
+          path: ./*
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
@@ -58,7 +58,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
-      #   path: .cache
+          path: ./*
       # - name: Post Cmment to PR
       #   run: |
       #     for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
