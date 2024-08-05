@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.PROD_REPO }}
-          fetch-depth: 0
+          # fetch-depth: 0
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
@@ -32,10 +32,8 @@ jobs:
       - name: Set up build cache
         uses: actions/cache/restore@v4
         with:
-          key: mkdocs-${{ hashfiles('.cache/**') }}
+          key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
           path: .cache
-          restore-keys: |
-            mkdocs-
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
@@ -43,7 +41,7 @@ jobs:
             mkdir public
             for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
                 git checkout origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-                mkdocs build --quiet --site-dir public/$pr 
+                mkdocs build --dirty --quiet --site-dir public/$pr 
             done
       - name: Adjust permissions
         run: |
@@ -59,16 +57,14 @@ jobs:
       - name: Save build cache
         uses: actions/cache/save@v4
         with:
-          key: mkdocs-${{ hashfiles('.cache/**') }}
+          key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
           path: .cache
       # - name: Post Cmment to PR
       #   run: |
       #     for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
       #         msg="Test deployment available at <a href=\"${DEPLOY_URL}/${pr}\">${DEPLOY_URL}/${pr}</a>"
       #         gh pr view ${pr} -R ${PROD_REPO}
-      #         gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO}
-              
-
-              (gh pr comment ${pr} --edit-last --body "${msg}" -R ${PROD_REPO}) || (gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO})
-          done
+      #         gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO}   
+      #         (gh pr comment ${pr} --edit-last --body "${msg}" -R ${PROD_REPO}) || (gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO})
+      # done
           
