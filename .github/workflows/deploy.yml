@@ -29,10 +29,11 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: requirements.txt
-      - name: Set up build cache
+      - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
           key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
+          restore-keys: mkdocs-cache
           path: ./*
       - name: Install Python dependencies
         run: pip install -r requirements.txt
@@ -59,8 +60,9 @@ jobs:
       - name: Save build cache
         uses: actions/cache/save@v4
         with:
-          key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
+          key: mkdocs-cache
           path: ./*
+          restore-keys: mkdocs-cache
       # - name: Post Cmment to PR
       #   run: |
       #     for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
