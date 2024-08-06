@@ -6,8 +6,8 @@ on:
     inputs:
       use-cache:
         description: If use cache or not.
-        type: bool
-        default: True
+        type: boolean
+        default: true
       pr-branches:
         description: List of branches to deploy.
         type: text
