@@ -4,6 +4,10 @@ on:
     types: deploy
   workflow_dispatch:
     inputs:
+      use-cache:
+        description: If use cache or not.
+        type: bool
+        default: True
       pr-branches:
         description: List of branches to deploy.
         type: text
@@ -30,7 +34,8 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: requirements.txt
-      - name: Restore build cache
+      - if: ${{ github.event.client_payload.use-cache || inputs.use-cache }}
+        name: Restore build cache
         uses: actions/cache/restore@v4
         with:
           key: mkdocs-cache-${{ hashfiles('./*') }}
