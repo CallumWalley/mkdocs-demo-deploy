@@ -28,7 +28,7 @@ jobs:
           echo "Use Cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
           echo "PR Branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
       - name: Fail
-        if: ${{ ! ( github.event.client_payload.pr-branches || inputs.pr-branches ) }}
+        if: ${{ (! github.event.client_payload.pr-branches) || (! inputs.pr-branches) }}
         run: |
           echo "::error title=No Inputs::No input branches given. Nothing will be built."
           exit 1
