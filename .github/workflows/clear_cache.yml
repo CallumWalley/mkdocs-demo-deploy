@@ -9,8 +9,6 @@ jobs:
   clear-cache:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
     - name: Get active PR Branches
       id: get-branches
       run: |
@@ -18,7 +16,7 @@ jobs:
           echo "info:: title=Open Valid Merge Requests" :: ${branches}
           echo "branches=$branches" >> $GITHUB_OUTPUT
     - name: Trigger Deployments
-      uses: ./.github/workflows/deploy.yml
+      uses: CallumWalley/support-docs-dev/.github/workflows/deploy.yml@main
       with: 
         use-cache: false
         pr-branches: ${{ steps.get-branches.outputs.branches }}
