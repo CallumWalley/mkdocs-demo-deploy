@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       use-cache:
-        description: If use cache or not.
+        description: Use Cache
         type: boolean
         default: true
       pr-branches:
