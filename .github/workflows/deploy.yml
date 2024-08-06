@@ -23,6 +23,10 @@ jobs:
     name: Build documentation
     runs-on: ubuntu-latest
     steps:
+      - name: Print Inputs
+        run: |
+          echo "Use Cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
+          echo "PR Branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
