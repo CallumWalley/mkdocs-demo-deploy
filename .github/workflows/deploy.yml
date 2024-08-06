@@ -27,6 +27,9 @@ jobs:
         run: |
           echo "Use Cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
           echo "PR Branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
+      - name: Fail
+        if: ${{ ! ( github.event.client_payload.pr-branches || inputs.pr-branches ) }}
+        run: exit 1
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
