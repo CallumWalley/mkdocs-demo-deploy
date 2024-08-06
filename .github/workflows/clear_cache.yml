@@ -9,6 +9,8 @@ jobs:
   clear-cache:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
     - name: Get active PR Branches
       id: get-branches
       run: |
