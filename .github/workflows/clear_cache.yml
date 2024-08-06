@@ -1,0 +1,22 @@
+name: Clear Cache
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+env:
+  PROD_REPO: nesi/support-docs
+jobs: 
+  clear-cache:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get active PR Branches
+      id: get-branches
+      run: |
+          branches="$(for pr in $(gh pr list --repo ${PROD_REPO} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
+          echo "info:: title=Open Valid Merge Requests" :: ${branches}
+          echo "branches=$branches" >> $GITHUB_OUTPUT
+    - name: Trigger Deployments
+      uses: ./.github/workflows/deploy.yml
+      with: 
+        use-cache: false
+        pr-branches: ${{ steps.get-branches.outputs.branches }}
