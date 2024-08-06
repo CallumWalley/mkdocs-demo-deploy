@@ -32,6 +32,7 @@ jobs:
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
+          key: mkdocs-cache-${{ hashfiles('./*') }}
           restore-keys: |
             mkdocs-cache-
           path: ./*
