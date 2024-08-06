@@ -55,8 +55,6 @@ jobs:
           path: public
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-      - name: Try Delete Cache
-        run: gh cache delete mkdocs-cache 
       - name: Save build cache
         uses: actions/cache/save@v4
         with:
