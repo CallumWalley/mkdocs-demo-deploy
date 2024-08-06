@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.PROD_REPO }}
-          # fetch-depth: 0
+          fetch-depth: 0
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
@@ -32,18 +32,18 @@ jobs:
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
-          key: mkdocs-cache # mkdocs-${{ hashfiles('.cache/**') }}
-          restore-keys: mkdocs-cache
+          restore-keys: |
+            mkdocs-cache-
           path: ./*
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
         run: |
-            mkdir -p public
-            for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-                git checkout origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-                mkdocs build --dirty --quiet --site-dir public/$pr 
-            done
+          mkdir -p public
+          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
+            git checkout origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
+            mkdocs build --dirty --quiet --site-dir public/$pr 
+          done
       - name: Adjust permissions
         run: |
           chmod -c -R +rX public/ | while read line; do
@@ -58,9 +58,8 @@ jobs:
       - name: Save build cache
         uses: actions/cache/save@v4
         with:
-          key: mkdocs-cache
+          key: mkdocs-cache-${{ hashfiles('./*') }}
           path: ./*
-          restore-keys: mkdocs-cache
       # - name: Post Cmment to PR
       #   run: |
       #     for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
