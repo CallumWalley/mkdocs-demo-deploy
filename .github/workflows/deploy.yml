@@ -69,7 +69,7 @@ jobs:
         run: |
           html="<h2>Currently Deployed Branches</h2><br><ul>"
           for BRANCH in public/*/;do 
-            html="${html}<li><a href=\"${DEPLOY_URL}/${BRANCH}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${PROD_REPO}/pull/$(basename ${BRANCH})\">$(basename ${BRANCH})</a></li>"
+            html="${html}<li><a href=\"${DEPLOY_URL}/$(basename ${BRANCH})\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${PROD_REPO}/pull/$(basename ${BRANCH})\">$(basename ${BRANCH})</a></li>"
           done
           echo "${html}</ul>" > public/index.html
       - name: Upload to GitHub Pages
