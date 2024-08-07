@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 env:
   PROD_REPO: nesi/support-docs
+  GH_TOKEN: ${{ github.token }}
 jobs: 
   get-branches:
     outputs:
