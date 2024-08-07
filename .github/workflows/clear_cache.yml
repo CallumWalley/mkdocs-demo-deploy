@@ -16,7 +16,7 @@ jobs:
       id: get-branches
       run: |
           branches="$(for pr in $(gh pr list --repo ${PROD_REPO} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
-          echo "info:: title=Open Valid Merge Requests" :: ${branches}
+          echo "::notice:: Open Valid Merge Requests: ${branches}"
           echo "branches=$branches" >> $GITHUB_OUTPUT
   trigger-workflow:
     needs: get-branches
