@@ -1,6 +1,11 @@
 name: Deploy to gh-pages 
 on:
-  workflow_call:
+  workflow_call:    
+    inputs:
+      use-cache:
+        type: boolean
+      pr-branches:
+        type: string
   repository_dispatch:
     types: deploy
   workflow_dispatch:
