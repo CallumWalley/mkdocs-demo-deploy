@@ -63,7 +63,7 @@ jobs:
         run: |
           mkdir -p public
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-            git checkout origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
+            git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
             mkdocs build --dirty --quiet --site-dir public/$pr 
           done
       - name: Adjust permissions
