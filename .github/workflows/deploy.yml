@@ -37,26 +37,30 @@ jobs:
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.PROD_REPO }}
-          fetch-depth: 0
-      - name: Set up Python runtime
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: requirements.txt
       - if: ${{ github.event.client_payload.use-cache || inputs.use-cache }}
         name: Restore build cache
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           key: mkdocs-cache-${{ hashfiles('./*') }}
           restore-keys: |
             mkdocs-cache-
           path: ./*
+      - name: Checkout repository
+        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PROD_REPO }}
+          fetch-depth: 0
+      - name: Set up Python runtime
+        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
       - name: Install Python dependencies
+        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
         run: |
@@ -83,6 +87,7 @@ jobs:
         uses: actions/deploy-pages@v4
       - name: Save build cache
         uses: actions/cache/save@v4
+        id: cache-save
         with:
           key: mkdocs-cache-${{ hashfiles('./*') }}
           path: ./*
