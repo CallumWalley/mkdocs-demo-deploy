@@ -63,6 +63,7 @@ jobs:
       - name: Create dev sub-deployments
         run: |
           mkdir -p public
+          git fetch origin
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
             git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
             mkdocs build --dirty --quiet --site-dir public/$pr 
