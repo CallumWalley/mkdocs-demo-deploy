@@ -31,9 +31,9 @@ jobs:
     steps:
       - name: Print Inputs
         run: |
-          echo ":: notice :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
-          echo ":: notice :: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
-          if [ ${{ !( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];do
+          echo ":: notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
+          echo ":: notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
+          if [ ${{ !( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
@@ -94,7 +94,7 @@ jobs:
       - name: Print message
         run: |
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-            echo ":: notice :: Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
+            echo ":: notice title=Deployment Sucessful :: Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
           done
       # - name: Post Cmment to PR
       #   run: |
