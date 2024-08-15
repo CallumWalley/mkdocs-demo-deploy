@@ -33,7 +33,7 @@ jobs:
         run: |
           echo ":: notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
           echo ":: notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
-          if [ ${{ !( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
+          if [ -z ${{ ( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
