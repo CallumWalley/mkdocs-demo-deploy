@@ -66,8 +66,6 @@ jobs:
             git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
             mkdocs build --dirty --quiet --site-dir public/$pr 
           done
-      - name: Adjust permissions
-        run: |
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
           done
