@@ -33,11 +33,10 @@ jobs:
         run: |
           echo ":: notice :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
           echo ":: notice :: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
-      - name: Fail
-        if: ${{ !( github.event.client_payload.pr-branches || inputs.pr-branches ) }}
-        run: |
-          echo "::error title=No Inputs::No input branches given. Nothing will be built."
-          exit 1
+          if [ ${{ !( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];do
+              echo "::error title=No Inputs::No input branches given. Nothing will be built."
+              exit 1
+          fi
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
