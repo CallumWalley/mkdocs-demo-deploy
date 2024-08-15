@@ -53,22 +53,19 @@ jobs:
           repository: ${{ env.PROD_REPO }}
           fetch-depth: 0
       - name: Set up Python runtime
-        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: requirements.txt
       - name: Install Python dependencies
-        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
         run: pip install -r requirements.txt
       - name: Create dev sub-deployments
         run: |
           mkdir -p public
-          which mkdocs
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
             git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-            ${RUNNER_TOOL_CACHE}/Python/${{ env.PYTHON_VERSION }}/x64/bin/mkdocs build --dirty --quiet --site-dir public/$pr 
+            mkdocs build --dirty --quiet --site-dir public/$pr 
           done
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
