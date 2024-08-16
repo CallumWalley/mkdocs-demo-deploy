@@ -47,7 +47,7 @@ jobs:
             mkdocs-cache-
           path: ./*
       - name: Checkout repository
-        if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
+        # if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
         uses: actions/checkout@v4
         with:
           repository: ${{ env.PROD_REPO }}
