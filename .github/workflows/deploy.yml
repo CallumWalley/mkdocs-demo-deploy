@@ -31,12 +31,13 @@ jobs:
     steps:
       - name: Print Inputs
         run: |
-          echo ":: notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
-          echo ":: notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
+          echo "::notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
+          echo "::notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
           if [ -z ${{ ( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
+      - run: ls && ls public
       - if: ${{ github.event.client_payload.use-cache || inputs.use-cache }}
         name: Restore build cache
         id: cache-restore
@@ -46,12 +47,14 @@ jobs:
           restore-keys: |
             mkdocs-cache-
           path: ./*
+      - run: ls && ls public
       - name: Checkout repository
         # if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
         uses: actions/checkout@v4
         with:
           repository: ${{ env.PROD_REPO }}
           fetch-depth: 0
+      - run: ls && ls public
       - name: Set up Python runtime
         uses: actions/setup-python@v5
         with:
@@ -60,6 +63,7 @@ jobs:
           cache-dependency-path: requirements.txt
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+      - run: ls && ls public
       - name: Create dev sub-deployments
         run: |
           mkdir -p public
@@ -71,6 +75,7 @@ jobs:
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
           done
+      - run: ls && ls public
       - name: Make index.html
         run: |
           html="<h2>Currently Deployed Branches</h2><br><ul>"
@@ -93,7 +98,7 @@ jobs:
       - name: Print message
         run: |
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-            echo ":: notice title=Deployment Sucessful :: Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
+            echo "::notice title=Deployment Sucessful::Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
           done
       # - name: Post Cmment to PR
       #   run: |
