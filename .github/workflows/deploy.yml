@@ -47,19 +47,19 @@ jobs:
             mkdocs-cache-
           path: ./*
       - run: ls && ls public
-      - name: Checkout repository
+      # - name: Checkout repository
         # if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.PROD_REPO }}
-          fetch-depth: 0
-      - run: ls && ls public
-      - name: Set up Python runtime
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: requirements.txt
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: ${{ env.PROD_REPO }}
+      #     fetch-depth: 0
+      # - run: ls && ls public
+      # - name: Set up Python runtime
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ env.PYTHON_VERSION }}
+      #     cache: pip
+      #     cache-dependency-path: requirements.txt
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - run: ls && ls public
