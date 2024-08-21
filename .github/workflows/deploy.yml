@@ -37,7 +37,6 @@ jobs:
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
-      - run: ls && ls public
       - if: ${{ github.event.client_payload.use-cache || inputs.use-cache }}
         name: Restore build cache
         id: cache-restore
