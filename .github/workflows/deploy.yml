@@ -47,13 +47,13 @@ jobs:
             mkdocs-cache-
           path: ./*
       - run: ls && ls public
-      # - name: Checkout repository
+      - name: Checkout repository
         # if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: ${{ env.PROD_REPO }}
-      #     fetch-depth: 0
-      # - run: ls && ls public
+        uses: actions/checkout@v4
+        with:
+          path: repo
+          repository: ${{ env.PROD_REPO }}
+          fetch-depth: 0
       # - name: Set up Python runtime
       #   uses: actions/setup-python@v5
       #   with:
@@ -61,7 +61,7 @@ jobs:
       #     cache: pip
       #     cache-dependency-path: requirements.txt
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r repo/requirements.txt
       - run: ls && ls public
       - name: Create dev sub-deployments
         run: |
@@ -69,7 +69,7 @@ jobs:
           git fetch
           for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
             git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-            mkdocs build --dirty --quiet --site-dir public/$pr 
+            mkdocs build --dirty --quiet --site-dir ../public/$pr 
           done
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
