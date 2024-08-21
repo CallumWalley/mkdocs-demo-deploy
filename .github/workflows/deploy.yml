@@ -75,10 +75,10 @@ jobs:
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
           done
+          cd ../
       - run: ls && ls public
       - name: Make index.html
         run: |
-          cd ../
           html="<h2>Currently Deployed Branches</h2><br><ul>"
           for BRANCH in public/*/;do 
             html="${html}<li><a href=\"${DEPLOY_URL}/$(basename ${BRANCH})\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${PROD_REPO}/pull/$(basename ${BRANCH})\">$(basename ${BRANCH})</a></li>"
