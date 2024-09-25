@@ -46,14 +46,6 @@ jobs:
           restore-keys: |
             mkdocs-cache-
           path: ./*
-      - run: ls && ls public
-      # - name: Set up Python runtime
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: ${{ env.PYTHON_VERSION }}
-      #     cache: pip
-      #     cache-dependency-path: requirements.txt
-      - run: ls && ls public
       - name: Create dev sub-deployments
         run: |
           for target in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do
