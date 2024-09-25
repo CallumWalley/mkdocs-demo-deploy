@@ -74,7 +74,7 @@ jobs:
           html="<h2>Currently Deployed Branches</h2><br><ul>"
           for REPO in public/*;do
             html="${html}<li>$REPO<ul>"
-            for BRANCH in public/$REPO/*;do
+            for BRANCH in $REPO/*;do
               html="${html}<li><a href=\"${DEPLOY_URL}/${BRANCH}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO}/pull/${BRANCH}\">${BRANCH}</a></li>"
             done
             echo "${html}</ul></li>"
