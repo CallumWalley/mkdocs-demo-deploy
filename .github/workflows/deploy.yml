@@ -48,7 +48,7 @@ jobs:
           path: ./*
       - name: Create dev sub-deployments
         run: |
-          for target in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do
+          for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
             mkdir -vp repo && rm -vrf repo/* 
             mkdir -vp "public/${target#*:}/${target%:*}"
             echo "Repo:'${target%:*}'\nBranch:'${target#*:}'"
