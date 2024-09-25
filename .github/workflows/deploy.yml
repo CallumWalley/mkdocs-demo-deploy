@@ -61,7 +61,8 @@ jobs:
             mkdir -vp "public/${target#*:}/${target%:*}"
             echo "Repo:'${target%:*}'\nBranch:'${target#*:}'"
             git clone --single-branch --branch ${target%:*} ${target#*:} repo || ( echo "Failed to checkout ${target}"; continue )
-            cd repo && mkdocs build --dirty --quiet --site-dir ../public/${target#*:}/${target%:*}
+            (cd repo && pip install -r requirements.txt)
+            (cd repo && mkdocs build --dirty --quiet --site-dir ../public/${target#*:}/${target%:*})
           done
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
