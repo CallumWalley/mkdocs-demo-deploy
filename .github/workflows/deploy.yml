@@ -69,7 +69,7 @@ jobs:
             html="${html}<li>${REPO#*/}<ul>"
             for BRANCH in $REPO/*;do
               SANSD=${BRANCH#*/}
-              html="${html}<li><a href=\"${DEPLOY_URL}/${SANSD#*/}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/${SANSD#*/}\">${SANSD#*/}</a></li>"
+              html="${html}<li><a href=\"${DEPLOY_URL}/${REPO#*/}/${SANSD#*/}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/${SANSD#*/}\">${SANSD#*/}</a></li>"
             done
             echo "${html}</ul></li>"
           done
@@ -89,7 +89,7 @@ jobs:
       - name: Print message
         run: |
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do                
-            echo "::notice title=Deployment Sucessful::Branch '${target}' deployed to ${DEPLOY_URL}/${target%:*}/${target#*:}"
+            echo "::notice title=Deployment Sucessful::Branch '${target}' deployed to ${DEPLOY_URL}${target%:*}/${target#*:}"
           done
       # - name: Post Cmment to PR
       #   run: |
