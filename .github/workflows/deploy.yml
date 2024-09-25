@@ -53,7 +53,7 @@ jobs:
             mkdir -vp "public/${target%:*}/${target#*:}"
             echo "Repo:'${target%:*}'"
             echo "Branch:'${target#*:}'"
-            git clone --single-branch --branch ${target#*:} ${target%:*} repo || ( echo "Failed to checkout ${target}"; continue )
+            git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo || ( echo "Failed to checkout ${target}"; continue )
             (cd repo && pip install -r requirements.txt)
             (cd repo && mkdocs build --dirty --quiet --site-dir ../public/${target%:*}/${target#*:})
           done
