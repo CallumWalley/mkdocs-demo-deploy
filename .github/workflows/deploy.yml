@@ -4,7 +4,7 @@ on:
     inputs:
       use-cache:
         type: boolean
-      pr-branches:
+      targets:
         type: string
   repository_dispatch:
     types: deploy
@@ -14,14 +14,14 @@ on:
         description: Use Cache
         type: boolean
         default: true
-      pr-branches:
+      targets:
         description: List of branches to deploy.
         type: text
 env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
   GH_TOKEN: ${{ github.token }}
-  PROD_REPO: nesi/support-docs
+  PROD_REPOS: nesi/support-docs,nesi/research-developer-cloud
   DEPLOY_URL: https://callumwalley.github.io/support-docs-dev/
 permissions: write-all
 jobs:
@@ -32,8 +32,8 @@ jobs:
       - name: Print Inputs
         run: |
           echo "::notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
-          echo "::notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
-          if [ -z ${{ ( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
+          echo "::notice title=PR branches: ${{ github.event.client_payload.targets || inputs.targets }}:: Targets: ${{ github.event.client_payload.targets || inputs.targets }}"
+          if [ -z ${{ ( github.event.client_payload.targets || inputs.targets ) }} ];then
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
@@ -68,9 +68,9 @@ jobs:
           mkdir -p public
           cd repo
           git fetch
-          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
+          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do
             git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-            mkdocs build --dirty --quiet --site-dir ../public/$pr 
+            mkdocs build --dirty --quiet --site-dir ../public/$pr
           done
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
@@ -98,7 +98,7 @@ jobs:
           path: ./*
       - name: Print message
         run: |
-          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
+          for pr in ${{ github.event.client_payload.targets || inputs.targets }}; do                
             echo "::notice title=Deployment Sucessful::Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
           done
       # - name: Post Cmment to PR
