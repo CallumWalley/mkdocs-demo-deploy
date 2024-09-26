@@ -4,23 +4,28 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
 env:
-  PROD_REPO: nesi/support-docs
+  PROD_REPOS: nesi/support-docs nesi/research-developer-cloud
   GH_TOKEN: ${{ github.token }}
 jobs: 
-  get-branches:
+  get-targets:
     outputs:
-      branches: ${{ steps.get-branches.outputs.branches }}
+      alltargets: ${{ steps.get-targets.outputs.alltargets }}
     runs-on: ubuntu-latest
     steps:
     - name: Get active PR Branches
-      id: get-branches
+      id: get-targets
       run: |
-          branches="$(for pr in $(gh pr list --repo ${PROD_REPO} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
-          echo "::notice:: Open Valid Merge Requests: ${branches}"
-          echo "branches=$branches" >> $GITHUB_OUTPUT
+          alltargets=""
+          for repo in $PROD_REPOS;do
+            branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
+            echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
+            for branch in ${branches};do alltargets="${alltargets} ${repo}:${branch}";done
+          done
+          echo "alltargets=${alltargets}" >> $GITHUB_OUTPUT
+          
   trigger-workflow:
-    needs: get-branches
-    uses: CallumWalley/support-docs-dev/.github/workflows/deploy.yml@main
+    needs: get-targets
+    uses: CallumWalley/mkdocs-demo-deploy/.github/workflows/deploy.yml@main
     with: 
       use-cache: false
-      pr-branches: ${{ needs.get-branches.outputs.branches }}
+      targets: ${{ needs.get-targets.outputs.targets }}

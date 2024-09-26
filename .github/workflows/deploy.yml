@@ -4,7 +4,7 @@ on:
     inputs:
       use-cache:
         type: boolean
-      pr-branches:
+      targets:
         type: string
   repository_dispatch:
     types: deploy
@@ -14,14 +14,14 @@ on:
         description: Use Cache
         type: boolean
         default: true
-      pr-branches:
+      targets:
         description: List of branches to deploy.
         type: text
 env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
   GH_TOKEN: ${{ github.token }}
-  PROD_REPO: nesi/support-docs
+  PROD_REPOS: nesi/support-docs,nesi/research-developer-cloud
   DEPLOY_URL: https://callumwalley.github.io/support-docs-dev/
 permissions: write-all
 jobs:
@@ -32,8 +32,8 @@ jobs:
       - name: Print Inputs
         run: |
           echo "::notice title=Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }} :: Use cache: ${{ github.event.client_payload.use-cache || inputs.use-cache }}"
-          echo "::notice title=PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}:: PR branches: ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}"
-          if [ -z ${{ ( github.event.client_payload.pr-branches || inputs.pr-branches ) }} ];then
+          echo "::notice title=PR branches: ${{ github.event.client_payload.targets || inputs.targets }}:: Targets: ${{ github.event.client_payload.targets || inputs.targets }}"
+          if [ -z ${{ ( github.event.client_payload.targets || inputs.targets ) }} ];then
               echo "::error title=No Inputs::No input branches given. Nothing will be built."
               exit 1
           fi
@@ -46,31 +46,17 @@ jobs:
           restore-keys: |
             mkdocs-cache-
           path: ./*
-      - run: ls && ls public
-      - name: Checkout repository
-        # if: ${{ ! steps.cache-restore.outputs.cache-matched-key }}
-        uses: actions/checkout@v4
-        with:
-          path: repo
-          repository: ${{ env.PROD_REPO }}
-          fetch-depth: 0
-      # - name: Set up Python runtime
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: ${{ env.PYTHON_VERSION }}
-      #     cache: pip
-      #     cache-dependency-path: requirements.txt
-      - name: Install Python dependencies
-        run: pip install -r repo/requirements.txt
-      - run: ls && ls public
       - name: Create dev sub-deployments
         run: |
-          mkdir -p public
-          cd repo
-          git fetch
-          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-            git checkout -f origin/$pr || ( echo "Failed to checkout ${pr}"; continue )
-            mkdocs build --dirty --quiet --site-dir ../public/$pr 
+          for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
+            rm -rf repo && mkdir -vp repo
+            mkdir -vp "public/${target%:*}/${target#*:}"
+            echo "Repo:'${target%:*}'"
+            echo "Branch:'${target#*:}'"
+            echo "git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo"
+            git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo || ( echo "Failed to checkout ${target}"; continue )
+            (cd repo && pip install -r requirements.txt)
+            (cd repo && mkdocs build --dirty --quiet --site-dir ../public/${target%:*}/${target#*:})
           done
           chmod -c -R +rX public/ | while read line; do
             echo "::info title=Invalid file permissions automatically fixed::$line"
@@ -80,8 +66,13 @@ jobs:
       - name: Make index.html
         run: |
           html="<h2>Currently Deployed Branches</h2><br><ul>"
-          for BRANCH in public/*/;do 
-            html="${html}<li><a href=\"${DEPLOY_URL}/$(basename ${BRANCH})\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${PROD_REPO}/pull/$(basename ${BRANCH})\">$(basename ${BRANCH})</a></li>"
+          for REPO in public/*/*;do
+            html="${html}<li>${REPO#*/}<ul>"
+            for BRANCH in $REPO/*;do
+              SANSD=${BRANCH#*/}
+              html="${html}<li><a href=\"${DEPLOY_URL}${SANSD}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/$( basename ${SANSD} )\">${SANSD#*/}</a></li>"
+            done
+            echo "${html}</ul></li>"
           done
           echo "${html}</ul>" > public/index.html
       - name: Upload to GitHub Pages
@@ -98,8 +89,8 @@ jobs:
           path: ./*
       - name: Print message
         run: |
-          for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-            echo "::notice title=Deployment Sucessful::Branch '${pr}' deployed to ${DEPLOY_URL}/${pr}"
+          for target in ${{ github.event.client_payload.targets || inputs.targets }}; do                
+            echo "::notice title=Deployment Sucessful::Branch '${target}' deployed to ${DEPLOY_URL}${target%:*}/${target#*:}"
           done
       # - name: Post Cmment to PR
       #   run: |
