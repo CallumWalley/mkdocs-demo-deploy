@@ -25,7 +25,7 @@ jobs:
           
   trigger-workflow:
     needs: get-targets
-    uses: CallumWalley/support-docs-dev/.github/workflows/deploy.yml@main
+    uses: CallumWalley/mkdocs-demo-deploy/.github/workflows/deploy.yml@main
     with: 
       use-cache: false
       targets: ${{ needs.get-targets.outputs.targets }}
