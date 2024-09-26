@@ -4,7 +4,7 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
 env:
-  PROD_REPOS: nesi/support-docs nesi/research-developer-cloud nesi/agdr-docs nesi/nesi-mkdoc-template MattBixley/eri-support-docs afasfaffsa/sadsadasdf
+  PROD_REPOS: nesi/support-docs nesi/research-developer-cloud nesi/agdr-docs nesi/nesi-mkdoc-template MattBixley/eri-support-docs
   GH_TOKEN: ${{ github.token }}
 jobs: 
   get-targets:
@@ -22,7 +22,6 @@ jobs:
             && echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
             for branch in ${branches};do targets="${targets} ${repo}:${branch}"; echo ${targets}; done
           done
-          echo $targets
           echo "targets=${targets}" >> $GITHUB_OUTPUT
           
   trigger-workflow:
