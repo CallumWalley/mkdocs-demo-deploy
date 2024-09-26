@@ -4,7 +4,7 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
 env:
-  PROD_REPOS: nesi/support-docs nesi/research-developer-cloud nesi/agdr-docs nesi/nesi-mkdoc-template MattBixley/eri-support-docs nesi/modules-list
+  PROD_REPOS: nesi/support-docs nesi/research-developer-cloud nesi/agdr-docs nesi/nesi-mkdoc-template MattBixley/eri-support-docs afasfaffsa/sadsadasdf
   GH_TOKEN: ${{ github.token }}
 jobs: 
   get-targets:
