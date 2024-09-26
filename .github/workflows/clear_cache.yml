@@ -19,8 +19,8 @@ jobs:
           for repo in $PROD_REPOS;do
             branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)" \
             || echo "::warning:: Could not read from ${repo}" \
-            && ( echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}" && \
-            for branch in "${branches}";do targets="${targets} ${repo}:${branch}"; echo ${targets}; done )
+            && echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
+            for branch in "${branches}";do targets="${targets} ${repo}:${branch}"; echo ${targets}; done
           done
           echo $targets
           echo "targets=${targets}" >> $GITHUB_OUTPUT
