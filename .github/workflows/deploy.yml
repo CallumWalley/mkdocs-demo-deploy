@@ -70,7 +70,7 @@ jobs:
             html="${html}<li>${REPO#*/}<ul>"
             for BRANCH in $REPO/*;do
               SANSD=${BRANCH#*/}
-              html="${html}<li><a href=\"${DEPLOY_URL}${REPO#*/}/${SANSD#*/}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/$( basename ${SANSD} )\">${SANSD#*/}</a></li>"
+              html="${html}<li><a href=\"${DEPLOY_URL}/${SANSD}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/$( basename ${SANSD} )\">${SANSD#*/}</a></li>"
             done
             echo "${html}</ul></li>"
           done
