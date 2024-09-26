@@ -17,7 +17,7 @@ jobs:
       run: |
           alltargets=""
           for repo in $PROD_REPOS;do
-            branches="$(for pr in $(gh pr list --repo ${PROD_REPO} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
+            branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
             echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
             for branch in ${branches};do alltargets="${alltargets} ${repo}:${branch}";done
           done
