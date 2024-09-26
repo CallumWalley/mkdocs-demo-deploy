@@ -9,19 +9,20 @@ env:
 jobs: 
   get-targets:
     outputs:
-      alltargets: ${{ steps.get-targets.outputs.alltargets }}
+      targets: ${{ steps.get-targets.outputs.targets }}
     runs-on: ubuntu-latest
     steps:
     - name: Get active PR Branches
       id: get-targets
       run: |
-          alltargets=""
+          targets=""
           for repo in $PROD_REPOS;do
-            branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)"
-            echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
-            for branch in ${branches};do alltargets="${alltargets} ${repo}:${branch}";done
+            branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)" \
+            || echo "::warning:: Could not read from ${repo}" \
+            && ( echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"; \
+            for branch in ${branches};do targets="${targets} ${repo}:${branch}";done )
           done
-          echo "alltargets=${alltargets}" >> $GITHUB_OUTPUT
+          echo "targets=${targets}" >> $GITHUB_OUTPUT
           
   trigger-workflow:
     needs: get-targets
