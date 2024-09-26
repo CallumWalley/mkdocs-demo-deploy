@@ -28,4 +28,4 @@ jobs:
     uses: CallumWalley/support-docs-dev/.github/workflows/deploy.yml@main
     with: 
       use-cache: false
-      pr-branches: ${{ needs.get-targets.outputs.targets }}
+      targets: ${{ needs.get-targets.outputs.targets }}
