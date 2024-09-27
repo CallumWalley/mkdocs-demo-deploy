@@ -21,7 +21,7 @@ env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
   GH_TOKEN: ${{ github.token }}
-  DEPLOY_URL: https://callumwalley.github.io/support-docs-dev/
+  DEPLOY_URL: https://callumwalley.github.io/mkdocs-demo-deploy/
 permissions: write-all
 jobs:
   documentation:
@@ -76,7 +76,7 @@ jobs:
               SANSD=${BRANCH#*/}
               html="${html}<li><a href=\"${DEPLOY_URL}${SANSD}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/$( basename ${SANSD} )\">${SANSD#*/}</a></li>"
             done
-            echo "${html}</ul></li>"
+            html="${html}</ul></li>"
           done
           echo "${html}</ul>" > public/index.html
       - name: Upload to GitHub Pages
