@@ -21,7 +21,6 @@ env:
   MODULE_LIST_PATH: docs/assets/module-list.json
   PYTHON_VERSION: 3.x
   GH_TOKEN: ${{ github.token }}
-  PROD_REPOS: nesi/support-docs,nesi/research-developer-cloud
   DEPLOY_URL: https://callumwalley.github.io/support-docs-dev/
 permissions: write-all
 jobs:
@@ -97,12 +96,3 @@ jobs:
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do                
             echo "::notice title=Deployment Sucessful::Branch '${target}' deployed to ${DEPLOY_URL}${target%:*}/${target#*:}"
           done
-      # - name: Post Cmment to PR
-      #   run: |
-      #     for pr in ${{ github.event.client_payload.pr-branches || inputs.pr-branches }}; do                
-      #         msg="Test deployment available at <a href=\"${DEPLOY_URL}/${pr}\">${DEPLOY_URL}/${pr}</a>"
-      #         gh pr view ${pr} -R ${PROD_REPO}
-      #         gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO}   
-      #         (gh pr comment ${pr} --edit-last --body "${msg}" -R ${PROD_REPO}) || (gh pr comment ${pr} --body "${msg}" -R ${PROD_REPO})
-      # done
-          
