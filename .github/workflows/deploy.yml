@@ -47,6 +47,7 @@ jobs:
           path: ./*
       - name: Create dev sub-deployments
         run: |
+          set -e
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
             echo "Building for Repo:'${target%:*}' Branch:'${target#*:}"
             # echo "::group::Setting Up Directories"
@@ -57,7 +58,7 @@ jobs:
             # echo ::endgroup::
             # echo "::group::Installing Dependencies"
             ls -latr repo
-            (cd repo && pip install -r requirements.txt) ||  echo "Failed to install dependencies for ${target}";continue
+            (cd repo && pip install -r requirements.txt) ||  ( echo "Failed to install dependencies for ${target}" && continue)
             # echo ::endgroup::
             # echo "::group::Building"
             (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) ||  ( echo "Failed to build ${target}" && continue )
