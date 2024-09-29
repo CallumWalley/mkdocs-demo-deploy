@@ -49,19 +49,19 @@ jobs:
         run: |
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
             echo "Building for Repo:'${target%:*}' Branch:'${target#*:}"
-            echo "::group::Setting Up Directories"
+            # echo "::group::Setting Up Directories"
             rm -rf repo && mkdir -vp repo
             mkdir -vp "public/${target%:*}/${target#*:}"        
             echo "git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo"
-            git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo ||  echo "Failed to checkout ${target}";continue
-            echo ::endgroup::
-            echo "::group::Installing Dependencies"
+            git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo ||  ( echo "Failed to checkout ${target}" && continue )
+            # echo ::endgroup::
+            # echo "::group::Installing Dependencies"
             ls -latr repo
             (cd repo && pip install -r requirements.txt) ||  echo "Failed to install dependencies for ${target}";continue
-            echo ::endgroup::
-            echo "::group::Building"
-            (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) ||  echo "Failed to build ${target}";continue
-            echo ::endgroup::
+            # echo ::endgroup::
+            # echo "::group::Building"
+            (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) ||  ( echo "Failed to build ${target}" && continue )
+            # echo ::endgroup::
             echo "::notice title=Build Sucessful::Branch '${target}' built successfully"
           done
           chmod -c -R +rX public/ | while read line; do
