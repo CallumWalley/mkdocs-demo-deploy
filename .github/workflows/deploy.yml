@@ -47,19 +47,23 @@ jobs:
           path: ./*
       - name: Create dev sub-deployments
         run: |
+          fail(){
+             echo "::warning title:Failed to serve ${target} :: $* See log for more details."
+             echo "<a href="{{ github.server_url }}{{ github.repository }}actions/runs{{ github.job}}>Deploy Failed. See workflow.</a>" > "public/${target%:*}/${target#*:}/index.html"
+          }
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
             echo "::group::Building Repo:'${target%:*}' Branch:'${target#*:}"
             echo "Setting Up Directories"
             rm -rf repo && mkdir -vp repo
             mkdir -vp "public/${target%:*}/${target#*:}"        
             git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo || \
-            { echo "::warning title:Failed to serve ${target} :: Could not checkout https://github.com/${target%:*}, See log for more details." && continue; }
+            { fail "Could not checkout https://github.com/${target%:*}" && continue; }
             echo "Installing Dependencies"
             (cd repo && pip install -r requirements.txt) || \
-            { echo "::warning title:Failed to serve ${target} :: Could not install dependencies, see log for more details." && continue; }
+            { fail "Could not install dependencies" && continue; }
             echo "Building"
             (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) || \
-            { echo "::warning title:Failed to serve ${target} :: Could not build, see log for more details." && continue; }
+            { fail "Could not build" && continue; }
             chmod -c -R +rX public/${target%:*} 
             echo "::endgroup::"
             echo "::notice title=Build Sucessful::Branch '${target}' built successfully"
@@ -89,8 +93,3 @@ jobs:
         with:
           key: mkdocs-cache-${{ hashfiles('./*') }}
           path: ./*
-      - name: Print message
-        run: |
-          for target in ${{ github.event.client_payload.targets || inputs.targets }}; do                
-            echo "::notice title=Deployment Sucessful::Branch '${target}' deployed to ${DEPLOY_URL}${target%:*}/${target#*:}"
-          done
