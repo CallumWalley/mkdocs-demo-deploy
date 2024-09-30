@@ -53,13 +53,13 @@ jobs:
             rm -rf repo && mkdir -vp repo
             mkdir -vp "public/${target%:*}/${target#*:}"        
             git clone --single-branch --branch ${target#*:} https://github.com/${target%:*} repo || \
-            { echo "::warning title:Failed to serve ${target} :: Could not checkout https://github.com/${target%:*}, See log for more details." && continue }
+            { echo "::warning title:Failed to serve ${target} :: Could not checkout https://github.com/${target%:*}, See log for more details." && continue; }
             echo "Installing Dependencies"
             (cd repo && pip install -r requirements.txt) || \
-            { echo "::warning title:Failed to serve ${target} :: Could not install dependencies, see log for more details." && continue }
+            { echo "::warning title:Failed to serve ${target} :: Could not install dependencies, see log for more details." && continue; }
             echo "Building"
             (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) || \
-            { echo "::warning title:Failed to serve ${target} :: Could not build, see log for more details." && continue }
+            { echo "::warning title:Failed to serve ${target} :: Could not build, see log for more details." && continue; }
             chmod -c -R +rX public/${target%:*} 
             echo "::endgroup::"
             echo "::notice title=Build Sucessful::Branch '${target}' built successfully"
