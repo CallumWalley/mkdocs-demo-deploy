@@ -49,7 +49,7 @@ jobs:
         run: |
           fail(){
              echo "::warning title:Failed to serve ${target} :: $* See log for more details."
-             echo "<a href="{{ github.server_url }}{{ github.repository }}actions/runs{{ github.job}}>Deploy Failed. See workflow.</a>" > "public/${target%:*}/${target#*:}/index.html"
+             echo "<a href=\"{{ github.server_url }}{{ github.repository }}actions/runs{{ github.job}}\">Deploy Failed. See workflow.</a>" > "public/${target%:*}/${target#*:}/index.html"
           }
           for target in ${{ github.event.client_payload.targets || inputs.targets }}; do
             echo "::group::Building Repo:'${target%:*}' Branch:'${target#*:}"
