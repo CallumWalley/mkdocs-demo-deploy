@@ -60,9 +60,7 @@ jobs:
             echo "Building"
             (cd repo && mkdocs build --dirty --site-dir ../public/${target%:*}/${target#*:}) || \
             { echo "::warning title:Failed to serve ${target} :: Could not build, see log for more details." && continue }
-            chmod -c -R +rX public/${target%:*} | while read line; do
-              echo "Fixed invalid file permissions."
-            done
+            chmod -c -R +rX public/${target%:*} 
             echo "::endgroup::"
             echo "::notice title=Build Sucessful::Branch '${target}' built successfully"
           done
