@@ -1,32 +1,78 @@
 name: Clear Cache
 on:
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 env:
   PROD_REPOS: nesi/support-docs nesi/research-developer-cloud nesi/agdr-docs nesi/nesi-mkdoc-template MattBixley/eri-support-docs
   GH_TOKEN: ${{ github.token }}
-jobs: 
-  get-targets:
-    outputs:
-      targets: ${{ steps.get-targets.outputs.targets }}
+  DEPLOY_URL: https://callumwalley.github.io/mkdocs-demo-deploy/
+permissions:
+  pages: write
+  id-token: write
+jobs:
+  prune-stale-deployments:
+    name: Remove deployments for closed PRs
     runs-on: ubuntu-latest
     steps:
-    - name: Get active PR Branches
-      id: get-targets
-      run: |
-          targets=""
-          for repo in $PROD_REPOS;do
-            branches="$(for pr in $(gh pr list --repo ${repo} --json headRefName | jq -r '.[].headRefName'); do printf "${pr} "; done)" \
-            || echo "::warning:: Could not read from ${repo}" \
-            && echo "::notice:: Open Valid Merge Requests in ${repo}: ${branches}"
-            for branch in ${branches};do targets="${targets} ${repo}:${branch}"; echo ${targets}; done
+      # Same key/path deploy.yml uses to cache the built site, so restoring
+      # here gives us the site as it currently stands, with no rebuild.
+      - name: Restore build cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          key: mkdocs-cache-${{ hashFiles('./*') }}
+          restore-keys: |
+            mkdocs-cache-
+          path: ./*
+
+      - name: List currently open PR branches
+        run: |
+          : > open_targets.txt
+          for repo in $PROD_REPOS; do
+            gh pr list --repo "${repo}" --state open --json headRefName --jq '.[].headRefName' \
+              | while read -r branch; do echo "${repo}:${branch}" >> open_targets.txt; done
           done
-          echo "targets=${targets}" >> $GITHUB_OUTPUT
-          
-  trigger-workflow:
-    needs: get-targets
-    uses: CallumWalley/mkdocs-demo-deploy/.github/workflows/deploy.yml@main
-    with: 
-      use-cache: false
-      targets: ${{ needs.get-targets.outputs.targets }}
+          echo "::notice title=Open targets::$(paste -sd' ' open_targets.txt)"
+
+      - name: Prune deployments for closed/merged PRs
+        run: |
+          mkdir -p public
+          shopt -s nullglob
+          for branch_dir in public/*/*/*/; do
+            branch_dir="${branch_dir%/}"
+            branch="${branch_dir##*/}"
+            repo="${branch_dir#public/}"; repo="${repo%/*}"
+            target="${repo}:${branch}"
+            if ! grep -qxF "$target" open_targets.txt; then
+              echo "Removing stale deployment: ${target}"
+              rm -rf "$branch_dir"
+            fi
+          done
+
+      - name: Regenerate index.html
+        run: |
+          html="<h2>Currently Deployed Branches</h2><br><ul>"
+          for REPO in public/*/*;do
+            html="${html}<li>${REPO#*/}<ul>"
+            for BRANCH in $REPO/*;do
+              SANSD=${BRANCH#*/}
+              html="${html}<li><a href=\"${DEPLOY_URL}${SANSD}\">$(stat -c %w ${BRANCH})</a> from <a href=\"https://github.com/${REPO#*/}/pull/$( basename ${SANSD} )\">${SANSD#*/}</a></li>"
+            done
+            html="${html}</ul></li>"
+          done
+          echo "${html}</ul>" > public/index.html
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+      - name: Save pruned cache
+        uses: actions/cache/save@v4
+        with:
+          key: mkdocs-cache-${{ hashFiles('./*') }}
+          path: ./*
